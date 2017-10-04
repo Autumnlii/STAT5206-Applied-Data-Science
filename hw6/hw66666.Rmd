@@ -1,0 +1,143 @@
+---
+title: "hw6"
+author: "Autumn Li UNI:ql2280"
+date: "11/7/2016"
+output: pdf_document
+---
+#Part 1: Inverse Transform Method
+1. Define a function f which takes three inputs x, a vector, and scalars a and xmin having default values of a = aˆ and xmin = $407, 760. 
+```{r}
+report <- read.csv("~/Desktop/report.csv", header=FALSE)
+report = report[-1,]
+x.min = 407760
+a.hat = 2.654
+x = c(407760:1000000)
+f = function (x,x.min = x.min, a.hat = a.hat){
+  result = ((a.hat - 1)/x.min)*((x/x.min)^-a.hat)
+  return(result)
+  }
+ans = f(x,x.min,a.hat)
+plot(x,ans,main = "function between xmin and 1000000",ylab = "estimated value",xlab = "value between xmin and 1000000")
+```
+2. For x > xmin, the cdf equals
+```{r}
+u = 0.5
+upper.income = function (u = u,x.min = 407760,a = 2.654 ){
+  result = (1-u)^(1/(1-a))*x.min
+  return(result)
+  }
+upper.income(0.5)
+```
+3. Using the Inverse Transform Method
+```{r}
+x = runif(1000)
+result.1 = upper.income(x)
+ans.1 = f(result.1,x.min,a.hat)
+hist(ans.1,main = "Estimated value of Pareto distribution", xlab = "1000 simulated draw")
+```
+4. Using your simulated set, estimate the median income for the richest 1% of the world.
+```{r}
+result.1 = upper.income(x)
+result.2 = median(result.1);result.2
+upper.income(0.5)
+```
+#Part 2: Reject-Accept Method
+5. Write a function f that takes as input a vector x and returns a vector of f(x) values.
+```{r}
+x = c(-3:3)
+f <- function(x) {
+  return(ifelse((x <= -1 | x >= 3), 0, 1/9*(4-x^2))) 
+  }
+plot(x,f(x),xlimylab = "Estimated value",xlab =" X",type = "l")
+lines(f(x))
+```
+6. Determine the maximum of f(x) and find an envelope function e(x) by using a uniform density for g(x).
+```{r}
+xmax = 0
+f.max = 4/9
+e <- function(x) {
+  return(ifelse((x <= -1 | x > 3), Inf, f.max)) }
+e(x)
+```
+7. Using the Accept-Reject Algorithm
+```{r}
+n.samps <- 1000
+n <- 0  
+samps <- numeric(n.samps)
+while (n < n.samps) {
+  y <- runif(1,-3,3)
+  u = runif(1)
+  if (u < f(y)/e(y)) {
+    n <-n+1
+    samps[n] <- y
+    }
+  }
+```
+8. Plot a histogram of your simulated data with the density function f overlaid in the graph. Label your plot appropriately.
+```{r}
+x <- seq(0, 1, length = 100)
+hist(samps, prob = T, xlim=c(-3,3),ylab = "f(x)", xlab = "x",main = "Histogram of draws from f(x)")
+lines(x, f(x),col = "red")
+```
+#Part 3: Simulation with Built-in R Functions
+9. Write a while() loop to implement this procedure.
+```{r}
+x.start = 5
+n.1 = 1
+x.vals =NULL
+while(x.start > 0) {
+  r = runif(1,min = -2, max = 1)
+  x.start= x.start + r
+  x.vals[n.1] = x.start
+  n.1 = n.1 +1
+  }
+x.vals
+n.1
+```
+10. Produce a plot of the random walk values x.vals from above versus the iteration number. 
+```{r}
+plot(c(1:(n.1-1)),x.vals,xlab = "Iteration Number",ylab = "x.values")
+lines(x.vals)
+```
+11. Write a function random.walk() to perform the random walk procedure that you implemented in question (9)
+```{r}
+random.walk = function (x.start = 5, plot.walk = TRUE){
+  x.vals =NULL
+  n.1 = 1
+  while(x.start > 0) {
+    r = runif(1,min = -2, max = 1)
+    x.start= x.start + r
+    x.vals[n.1] = x.start
+    n.1 = n.1 +1
+    }
+  num.steps = c(1:(n.1-1))
+  result = list(x.vals,num.steps)
+  if(plot.walk ==TRUE){
+    plot(num.steps,x.vals)
+    lines(x.vals)
+    }
+  return(result)
+  }
+random.walk(x.start = 5, plot.walk = TRUE)
+random.walk(x.start = 10, plot.walk = FALSE)
+```
+12. We’d like to answer the following question using simulation
+```{r}
+rep = 10000
+num = NULL
+for (i in 1:rep){
+  num[i] = max(unlist(random.walk(x.start = 5, plot.walk = FALSE)[2]))
+}
+avg_rep = mean(num);avg_rep
+```
+13. Modify your function random.walk() defined previously so that it takes an additional argument seed
+```{r}
+set.seed(NULL)
+random.walk(x.start = 5, plot.walk = TRUE)
+set.seed(NULL)
+random.walk(x.start = 10, plot.walk = FALSE)
+set.seed(33)
+random.walk(x.start = 5, plot.walk = TRUE)
+set.seed(33)
+random.walk(x.start = 10, plot.walk = FALSE)
+```

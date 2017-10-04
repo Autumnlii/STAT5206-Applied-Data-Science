@@ -1,0 +1,120 @@
+---
+title: "HW9a"
+author: "Autumn Li"
+date: "12/4/2016"
+output: pdf_document
+---
+#Part I
+#1
+(a) How many doctors began prescribing tetracycline in each month of the study? (b) How many never prescribed it? (c) How many are NAs?
+```{r}
+ckm_nodes.1 <- read.csv("~/Desktop/ckm_nodes-1.csv")
+ckm= ckm_nodes.1
+date = ckm$adoption_date
+na = length(date[date =="NA"]);na
+never = length(na.omit(date[date =="Inf"]));never
+begin = length(date)- length(date[date =="NA"]) - length(na.omit(date[date =="Inf"]));begin
+```
+(a)There are 109 doctors begin prescribing tetracyline in each month of the study;(b)There are 16 doctors never prescribing it.(c) There are 121 NA.
+
+2. Create a vector which records the index numbers of the doctors for whom adoption date is not NA.
+
+```{r}
+not.na = na.omit(date)
+ind_na = which(is.element(date=="NA",date))
+vect = 1:246
+dr_ind = vect[-ind_na]
+
+```
+3. Create a plot of the number of doctors who began prescribing tetracycline each month versus time.
+```{r}
+ind_inf = which(is.element(not.na=="Inf",not.na))
+dr_num = not.na[-ind_inf]
+dr_num = sort(dr_num);dr_num
+count2 = NULL
+i=1
+while(i <= max(dr_num)){
+  count1 = NULL
+  for(k in 1:length(dr_num)){
+    if(dr_num[k] == i){
+      count1[k] = 0
+      } 
+    }
+  count2[i] = length(na.omit(count1))
+    i = i +1 
+  }
+count2
+
+
+ind_inf = which(is.element(not.na=="Inf",not.na))
+dr_num = not.na[-ind_inf]
+dr_num = sort(dr_num);dr_num
+count3 = NULL
+count4 = NULL
+i=1
+while(i <= max(dr_num)){
+  for(k in 1:length(dr_num)){
+    if(dr_num[k] == i){
+      count4[k] = 0
+      } 
+    }
+  count3[i] = length(na.omit(count4))
+    i = i +1 
+  }
+count3
+par(mfrow=c(1,2))
+plot(time,count2)
+plot(count3)
+```
+4.Create a logical vector which indicates for each doctor whether they had begun pre- scribing tetracycline by month 2. 
+```{r}
+logic = NULL
+for(i in 1:length(not.na)){
+  if(not.na[i]<=2) {
+    logic[i] = 0
+    }
+  }
+vect1 = 1:length(logic)
+ind_m2 = vect1[-which(is.element(logic == 0,logic))]
+length(ind_m2)
+
+logic2 = NULL
+for(i in 1:length(not.na)){
+  if(not.na[i]>14) {
+    logic2[i] = 0
+    }
+  }
+vect2 = 1:length(logic2)
+ind_m14 = vect2[-which(is.element(logic2 == 0,logic2))]
+length(ind_m14)
+
+```
+#Part II
+5. 
+```{r}
+ckm_network.1 <- read.table("~/Desktop/ckm_network-1.txt", quote="\"")
+ckm_txt = ckm_network.1 
+dim(ckm_txt)
+network = ckm_txt[-ind_na,-ind_na]
+dim(network)
+
+```
+6. Create a vector which stores the number of contacts each doctor has. Do not use a loop. Check that doctor number 41 has 3 contacts.
+```{r}
+apply(network,1,sum)[41]
+```
+7.
+```{r}
+nodes = read.csv("~/Desktop/ckm_nodes-1.csv")
+date = nodes$adoption_date
+not.na = na.omit(date)
+ind_na = which(is.element(date=="NA",date))
+vect = 1:246
+dr_ind = vect[-ind_na]
+nodes = nodes[dr_ind,]
+doctor_37 = network[,37]
+m = sum(nodes$adoption_date <= 5 * network[,37])
+propotion = m/sum(network[,37])
+propotion
+
+```

@@ -1,0 +1,75 @@
+---
+title: "HW 3"
+author: "Autumn Li and UNI ql2280"
+date: "October 09, 2016"
+output: html_document
+---
+#i. Use the readLines() command we studied in class to load the NetsSchedule.html file into a character vector in R. Call the vector nets1617.
+a. How many lines are in the NetsSchedule.html file?
+```{r}
+hw3 = "~/Desktop/2016 fall/5206/hw3/NetsSchedule.html"
+nets = readLines(hw3)
+length = length(readLines(hw3)); length
+
+ # There are 811 lines in this html file. 
+```
+b. What is the total number of characters in the file?
+```{r}
+sum(nchar(nets))
+# There are 127835 characters in the file.
+```
+c.What is the maximum number of characters in a single line of the file?
+```{r}
+max(nchar(nets))
+
+# 7211 is the maximum number of characters in a single line of the file
+```
+#ii. Open NetsSchedule.html as a webpage.
+Who and when are they playing first? Who and when are they playing last?
+```{r}
+#The first game: Wed, Oct 26 7:30 PM, opponent is Boston 
+#The last game:Wed, Apr 12 8:00 PM, opponent is Chicago.
+```
+iii. Now, open NetsSchedule.html using a text editor.
+```{r}
+#The first line of the schedual provides the infomation of the first game.
+# The last line of the schedual provides the infomaiton of the last gaeme.
+```
+iv. Write a regular expression that will capture the date of the game.
+```{r}
+team.lines = grep(pattern="0 PM", x=nets);team.lines
+length(team.lines)
+nets[315]
+nets[397]
+
+# The fist locations matches the game on Oct 26.
+#The last location matches the game on April 12.
+```
+v. Using the expression  you wrote  in (v) along with the functions regexp() and regmatches(), extract the dates from the text file. Store this information in a vector called date to
+save to use below.
+```{r}
+pattern <- "0 PM"
+ m = regexpr(pattern, nets, perl=TRUE)
+regmatches(nets,m)
+```
+vi. Use the same strategy as in (v) and (vi) to create a time vector that stores the time of the game.
+```{r}
+pattern = "0 PM"
+m <- regexpr(pattern, nets)
+regmatches(nets, m)
+```
+vii. We would now like to gather information about whether the game is home or away.
+```{r}
+pattern = "@"
+m <- regexpr(pattern, nets)
+regmatches(nets, m)
+pattern1 = "vs"
+m <- regexpr(pattern1, nets)
+regmatches(nets, m)
+```
+viii. Finally we would like to find the opponent
+```{r}
+pattern = "@"
+m <- regexpr(pattern, nets)
+opponent = regmatches(nets, m)
+```

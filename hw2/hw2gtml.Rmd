@@ -1,0 +1,118 @@
+---
+title: "HW 2"
+author: "Autumn Li and UNI ql2280"
+date: "Oct,03 2016"
+output: html_document
+---
+
+#Part 1: Loading and Cleaning the Data in R
+i. Load the data into a dataframe called housing.
+ii. How many rows and columns does the dataframe have?
+```{r}
+data2 = "~/Desktop/2016 fall/5206/hw2/NYChousing.csv"
+housing = read.csv(file = data2, head=TRUE)
+nrow = dim(housing)[1];nrow
+ncol = dim(housing)[2];ncol
+View(housing)
+
+#There are 2506 rows and 22 columns in the data set.
+```
+iii. Run this command, and explain, in words, what this does:
+```{r}
+apply(is.na(housing), 2, sum)
+
+#Determing the number of the NA, and then calculating the sum of NA in each column.
+
+```
+iv. Remove the rows of the dataset for which the variable Value is NA.
+```{r}
+housing2 = housing[complete.cases(housing),]
+```
+v. How many rows did you remove with the previous call? Does this agree with your result from (iii)?
+```{r}
+#Number of rows deleted
+dim(housing)[1]-dim(housing2)[1]
+#Total number of NA in all columns
+sum(apply(is.na(housing), 2, sum))
+
+#I deleted 1876 rows with the previous call, the total number of NA in all columns is 1970.It is different with the result from part (iii)
+#The reason is that some rows has more than 1 NA, however, we delete the row as long as it has an NA.
+
+```
+
+vi. Create a new variable in the dataset called logValue that is equal to the logarithm of the property’s Value.
+```{r}
+value2 = housing2$Value
+logValue=log(value2)
+summary(logValue)
+```
+vii. Create a new variable in the dataset called logUnits that is equal to the logarithm of the number of units in the property. 
+
+```{r}
+UnitCount1 = housing2$UnitCount
+logUnits = log(UnitCount1)
+```
+viii. Finally create a new variable in the dataset called after1950 which equals TRUE
+
+```{r}
+after1950=housing2$YearBuilt>=1950
+housing3=cbind(housing2,after1950)
+```
+#Part 2: EDA
+i. Plot property logValue against property logUnits.
+```{r,echo = FALSE}
+plot(logValue~logUnits)
+```
+
+ii. Makethesameplotasabove,but now include the argument col = factor(housing$after1950).
+```{r}
+plot(logValue~logUnits,col = factor(housing3$after1950))
+legend("bottomright", legend = levels(factor(housing3$after1950)), fill = unique(factor(housing3$after1950)))
+
+#From the plot above, we can tell clearly that which poine is the "YearBuilt after 1950". The red point is the buidling built after 1950.
+```
+
+iii. The cor() function calculates the correlation coefficient between two variables.
+```{r}
+#(i) the whole data
+cor(logValue,logUnits)
+#(ii) just Manhattan
+Borough = housing3$Borough
+cor(logValue[Borough=="Manhattan"],logUnits[Borough=="Manhattan"])
+#(iii) just Brooklyn
+cor(logValue[Borough=="Brooklyn"],logUnits[Borough=="Brooklyn"])
+#(iv) for properties built after 1950
+cor(logValue[after1950=="TRUE"],logUnits[after1950=="TRUE"])
+#(v) for properties built before 1950
+cor(logValue[after1950=="FALSE"],logUnits[after1950=="FALSE"])
+```
+
+iv. Make two plots showing property logValue against property logUnits for Manhattan and Brooklyn.
+```{r}
+par(mfrow=c(1,2))
+plot(logValue[Borough=="Manhattan"],logUnits[Borough=="Manhattan"],xlab="logUnits",ylab ="log value",main = "Manhattan")
+plot(logValue[Borough=="Brooklyn"],logUnits[Borough=="Brooklyn"],xlab="logUnits",ylab ="log value",main = "Brooklyn")
+
+```
+
+v. Consider the following block of code.
+```{r}
+median(housing3$Value[Borough=="Manhattan"])
+
+#The block of cose has the function to calculate the median value of the Manhattan
+```
+
+vi. Make side-by-side box plots comparing property logValue across the five boroughs.
+```{r}
+par(mfrow=c(1,1))
+boxplot(logValue~housing3$Borough,data = housing3)
+```
+
+vii. For five boroughs, what are the median property values?
+```{r}
+median(housing3$Value[Borough=="Manhattan"])
+median(housing3$Value[Borough=="Bronx"])
+median(housing3$Value[Borough=="Brooklyn"])
+median(housing3$Value[Borough=="Queens"])
+median(housing3$Value[Borough=="Staten Island"])
+```

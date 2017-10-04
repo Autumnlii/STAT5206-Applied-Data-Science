@@ -1,0 +1,105 @@
+---
+title: "HW 1"
+author: "Autumn Li and UNI ql2280"
+date: "September 26, 2016"
+output: html_document
+---
+
+# Part 1: Importing Data into R
+i. Import the titanic dataset into RStudio using read.table().
+```{r}
+hw1 = "~/Desktop/2016 fall/5206/hw1/Titanic.txt"
+titanic = read.table(file = hw1, head = T)
+```
+ii. How many rows and columns does titanic have? 
+```{r}
+rows = dim(titanic)[1];rows
+col = dim(titanic)[2];col
+
+#There are 891 rows and 12 columns.
+```
+iii. Create a new variable in the data frame called Survived.Word.
+```{r}
+survived = titanic$Survived
+Survived.word = matrix(NA,nrow = rows, ncol = 1)
+x=1
+for ( x in 1:rows) {
+  if (survived[x] == 1)
+  {
+  Survived.word[x] = "Survived"
+  }
+    if (survived[x] == 0){
+      Survived.word[x] = "died"
+    }
+}
+new_titanic = cbind(titanic,Survived.word)
+new_titanic[1:5,c(2,13)]
+#A new column which is named as Survived.word has been created, and this new column has been combined into a new data set, "new_titanic"
+```
+#Part 2: Exploring the Data in R
+i. Use the apply() function
+```{r}
+survive = matrix(titanic$Survived)
+age = matrix(titanic$Age)
+fare = matrix(titanic$Fare)
+sub_titanic = matrix(NA,nrow= rows, ncol = 3)
+sub_titanic[,1]= survive
+sub_titanic[,2]= age
+sub_titanic[,3]= fare
+apply(sub_titanic,2,mean)
+
+#The mean of the variable survive is 0.3838384, it means only 38.38% people survived. 
+# Mean value of "Age" is NA, because this variable contains many missing data noted as NA. If we ues na.omit function to get rid of all the NA value, then we can have a numeric mean of age.
+
+```
+ii. Compute the proportion of female passengers who survived the titanic disaster.
+```{r}
+female = titanic$Survive[titanic$Sex =="female"]
+female_num = length(titanic$Survive[titanic$Sex =="female"]);female_num
+survive_female = length(female[female==1]);survive_female
+rate1 = survive_female/female_num;rate1
+rate1 = round(rate1,digits = 2);rate1
+# the proportion of female passengers who survived the titanic disaster is 0.74
+
+```
+
+iii. Of the survivors, compute the proportion of female passengers. 
+```{r}
+survivors = survived[survived == 1]
+survivors_num = length(survived[survived == 1]);survivors_num
+num_female = length(female[female==1]);num_female
+rate2 = round(num_female/survivors_num,digits=2);rate2
+#Of the survivors, compute the proportion of female passengers is 0.68
+```
+iv. Use the following code to create an empty numeric vector 
+```{r}
+classes <- sort(unique(titanic$Pclass))
+    Pclass.Survival <- vector("numeric", length = 3)
+    names(Pclass.Survival) <- classes
+for (i in 1:3) {
+      Pclass.Survival[i] = round(length(na.omit(survivors[titanic$Pclass==i]))/survivors_num,digits=2)
+}
+Pclass.Survival
+
+#The survive rate in first class is 0.24, in second class is 0.2, and the survive rate in third class is 0.56.
+```
+v. Now create a Pclass.Survival2 vector
+```{r}
+classes <- sort(unique(titanic$Pclass))
+    Pclass.Survival2 <- vector("numeric", length = 3)
+    names(Pclass.Survival2) <- classes
+Pclass.Survival2[1]=length(na.omit(survivors[titanic$Pclass==1]))
+Pclass.Survival2[2]=length(na.omit(survivors[titanic$Pclass==2]))
+Pclass.Survival2[3]=length(na.omit(survivors[titanic$Pclass==3]))
+
+proportion = function(x){
+  out = round(x/survivors_num,digits=2)
+  return(out)
+}
+tapply(Pclass.Survival2,INDEX=c(1,2,3),FUN = proportion)
+##The survive rate in first class is 0.24, in second class is 0.2, and the survive rate in third class is 0.56. The answer is the same.
+```
+vi. Does there appear to be a relationship between survival rate and class?
+```{r}
+#From the calculaiton above, the lowest survival rate is in second class, and the highest survival rate is in third class.However, we can not get a conclusion that the higher of class, the lower of the survival rate, because survival rate is related to many facotrs.
+```
